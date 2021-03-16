@@ -5,13 +5,61 @@
 """
 
 import json
+import numpy as np
+
+def f_0a938d79(input_npa):
+    
+    first_row = input_npa[0]    
+    transpose_flag = False
+    
+    if np.sum(first_row) == 0:
+        input_npa = input_npa.transpose()
+        transpose_flag = True
+        first_row = input_npa[0]
+    
+    last_row = input_npa[-1]
+    max_first_last = np.maximum(first_row, last_row)
+    
+    nz_ind = np.nonzero(max_first_last)
+    nz_ind_1 = nz_ind[0][0]
+    nz_ind_2 = nz_ind[0][1]
+    nz_diff = nz_ind_2 - nz_ind_1
+    color_1 = max_first_last[nz_ind_1]
+    color_2 = max_first_last[nz_ind_2]
+    
+    output_npa = np.zeros(input_npa.shape, dtype=int)
+    
+    fill_count = 0
+    while nz_ind_1 + fill_count*2*nz_diff < input_npa.shape[1]:
+        for i in range(input_npa.shape[0]):
+            output_npa[i][nz_ind_1 + fill_count*2*nz_diff] = color_1
+        fill_count += 1
+    
+    fill_count = 0
+    while nz_ind_2 + fill_count*2*nz_diff < input_npa.shape[1]:
+        for i in range(input_npa.shape[0]):
+            output_npa[i][nz_ind_2 + fill_count*2*nz_diff] = color_2
+        fill_count += 1
+    
+    if transpose_flag:
+        output_npa = output_npa.transpose()
+
+    return output_npa
+
 
 def main():
     
     with open('/home/mohr/ARC_challenge/ARC_repo_chollet/ARC/data/training/0a938d79.json') as f:
         task_dict = json.load(f)
-
-    print(task_dict['train'][0]['input'][0][5])
+    
+    train_list = task_dict['train']
+    
+    for i in range(len(train_list)):
+        curr_pair_dict = train_list[i]
+        curr_input_npa = np.asarray(curr_pair_dict['input'])
+        curr_output_npa = np.asarray(curr_pair_dict['output'])
+        f_output_npa = f_0a938d79(curr_input_npa)
+        print('train ' + str(i) + ': ' + str(np.array_equal(curr_output_npa, f_output_npa)))
 
 if __name__ == '__main__':
     main()
