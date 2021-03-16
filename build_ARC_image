@@ -1,0 +1,1 @@
+docker build -t arc_image -f dockerfile_ARC_image .

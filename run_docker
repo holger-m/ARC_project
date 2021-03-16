@@ -1,0 +1,3 @@
+docker run -it --name ARC_docker \
+    -v /home/mohr/ARC_challenge:/home/mohr/ARC_challenge \
+    arc_image
