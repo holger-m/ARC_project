@@ -4,6 +4,7 @@
 @author: holger mohr
 """
 
+import argparse
 import json
 import numpy as np
 
@@ -46,10 +47,54 @@ def f_0a938d79(input_npa):
 
     return output_npa
 
+def f_0b148d64(input_npa):
+    
+    color_sum = np.zeros(10, dtype=int)
+    for i in range(10):
+        color_sum[i] = np.sum(input_npa == i)
+    color_sum[0] = 0
+    max_ind = np.argmax(color_sum)
+    color_sum[max_ind] = 0
+    color_out_ind = np.argmax(color_sum)
+    
+    output_npa = np.zeros(input_npa.shape, dtype=int)    
+    for i in range(input_npa.shape[0]):
+        for j in range(input_npa.shape[1]):
+            if input_npa[i][j] == color_out_ind:
+                output_npa[i][j] = color_out_ind
+    
+    delete_rows_bool = np.zeros(input_npa.shape[0], dtype=bool)
+    for i in range(input_npa.shape[0]):
+        if np.sum(output_npa[i]) == 0:
+            delete_rows_bool[i] = True
+    output_npa = np.delete(output_npa, delete_rows_bool, axis=0)
+    
+    delete_cols_bool = np.zeros(input_npa.shape[1], dtype=bool)
+    for j in range(input_npa.shape[1]):
+        if np.sum(output_npa[:,j]) == 0:
+            delete_cols_bool[j] = True
+    output_npa = np.delete(output_npa, delete_cols_bool, axis=1)
+    
+    return output_npa
+
+def task_selector(task_name, input_npa):
+    
+    if task_name == '0a938d79':
+        output_npa = f_0a938d79(input_npa)
+    elif task_name == '0b148d64':
+        output_npa = f_0b148d64(input_npa)
+    else:
+        raise Exception('Task solver not found!')
+    
+    return output_npa
 
 def main():
     
-    with open('/home/mohr/ARC_challenge/ARC_repo_chollet/ARC/data/training/0a938d79.json') as f:
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-t', '--task_name', help='task name', type=str, required=True)
+    args = parser.parse_args()
+        
+    with open(('/home/mohr/ARC_challenge/ARC_repo_chollet/ARC/data/training/' + args.task_name + '.json')) as f:
         task_dict = json.load(f)
     
     train_list = task_dict['train']
@@ -58,8 +103,11 @@ def main():
         curr_pair_dict = train_list[i]
         curr_input_npa = np.asarray(curr_pair_dict['input'])
         curr_output_npa = np.asarray(curr_pair_dict['output'])
-        f_output_npa = f_0a938d79(curr_input_npa)
-        print('train ' + str(i) + ': ' + str(np.array_equal(curr_output_npa, f_output_npa)))
+        f_output_npa = task_selector(args.task_name, curr_input_npa)
+        if curr_output_npa.shape == f_output_npa.shape:
+            print('train ' + str(i) + ': ' + str(np.array_equal(curr_output_npa, f_output_npa)))
+        else:
+            print('train ' + str(i) + ': wrong shape')
 
 if __name__ == '__main__':
     main()
