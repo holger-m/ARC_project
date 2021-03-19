@@ -57,7 +57,7 @@ def f_0b148d64(input_npa):
     color_sum[max_ind] = 0
     color_out_ind = np.argmax(color_sum)
     
-    output_npa = np.zeros(input_npa.shape, dtype=int)    
+    output_npa = np.zeros(input_npa.shape, dtype=int)
     for i in range(input_npa.shape[0]):
         for j in range(input_npa.shape[1]):
             if input_npa[i][j] == color_out_ind:
@@ -77,12 +77,67 @@ def f_0b148d64(input_npa):
     
     return output_npa
 
+def f_0ca9ddb6(input_npa):
+    
+    output_npa = input_npa
+    
+    for i in range(input_npa.shape[0]):
+        for j in range(input_npa.shape[1]):
+            if input_npa[i,j] == 2:
+                output_npa[i-1,j-1] = 4
+                output_npa[i-1,j+1] = 4
+                output_npa[i+1,j-1] = 4
+                output_npa[i+1,j+1] = 4
+    
+    for i in range(input_npa.shape[0]):
+        for j in range(input_npa.shape[1]):
+            if input_npa[i,j] == 1:
+                output_npa[i-1,j] = 7
+                output_npa[i+1,j] = 7
+                output_npa[i,j-1] = 7
+                output_npa[i,j+1] = 7
+    
+    return output_npa
+
+def f_0d3d703e(input_npa):
+    
+    output_npa = np.zeros(input_npa.shape, dtype=int)
+    
+    for i in range(input_npa.shape[0]):
+        for j in range(input_npa.shape[1]):
+            if input_npa[i,j] == 0:
+                output_npa[i,j] = 0
+            elif input_npa[i,j] == 1:
+                output_npa[i,j] = 5
+            elif input_npa[i,j] == 2:
+                output_npa[i,j] = 6
+            elif input_npa[i,j] == 3:
+                output_npa[i,j] = 4
+            elif input_npa[i,j] == 4:
+                output_npa[i,j] = 3
+            elif input_npa[i,j] == 5:
+                output_npa[i,j] = 1
+            elif input_npa[i,j] == 6:
+                output_npa[i,j] = 2
+            elif input_npa[i,j] == 7:
+                output_npa[i,j] = 7
+            elif input_npa[i,j] == 8:
+                output_npa[i,j] = 9
+            elif input_npa[i,j] == 9:
+                output_npa[i,j] = 8
+    
+    return output_npa
+
 def task_selector(task_name, input_npa):
     
     if task_name == '0a938d79':
         output_npa = f_0a938d79(input_npa)
     elif task_name == '0b148d64':
         output_npa = f_0b148d64(input_npa)
+    elif task_name == '0ca9ddb6':
+        output_npa = f_0ca9ddb6(input_npa)
+    elif task_name == '0d3d703e':
+        output_npa = f_0d3d703e(input_npa)
     else:
         raise Exception('Task solver not found!')
     
