@@ -128,6 +128,35 @@ def f_0d3d703e(input_npa):
     
     return output_npa
 
+def f_00d62c1b(input_npa):
+    
+    output_npa = input_npa
+    
+    for i in range(output_npa.shape[0]):
+        for j in range(output_npa.shape[1]):
+            if output_npa[i,j] == 0:
+                if i == 0 or i == output_npa.shape[0] - 1 or j == 0 or j == output_npa.shape[1] - 1:
+                    output_npa[i,j] = 1
+    
+    for rep_ind in range(30):
+        for i in range(output_npa.shape[0]):
+            for j in range(output_npa.shape[1]):
+                if output_npa[i,j] == 0:
+                    if output_npa[i-1,j] == 1 or output_npa[i+1,j] == 1 or output_npa[i,j-1] == 1 or output_npa[i,j+1] == 1:
+                        output_npa[i,j] = 1
+    
+    for i in range(output_npa.shape[0]):
+        for j in range(output_npa.shape[1]):
+            if output_npa[i,j] == 0:
+                output_npa[i,j] = 4
+    
+    for i in range(output_npa.shape[0]):
+        for j in range(output_npa.shape[1]):
+            if output_npa[i,j] == 1:
+                output_npa[i,j] = 0
+    
+    return output_npa
+
 def task_selector(task_name, input_npa):
     
     if task_name == '0a938d79':
@@ -138,6 +167,8 @@ def task_selector(task_name, input_npa):
         output_npa = f_0ca9ddb6(input_npa)
     elif task_name == '0d3d703e':
         output_npa = f_0d3d703e(input_npa)
+    elif task_name == '00d62c1b':
+        output_npa = f_00d62c1b(input_npa)
     else:
         raise Exception('Task solver not found!')
     
