@@ -180,7 +180,7 @@ def main():
     parser.add_argument('-t', '--task_name', help='task name', type=str, required=True)
     args = parser.parse_args()
         
-    with open(('/home/mohr/ARC_challenge/ARC_repo_chollet/ARC/data/training/' + args.task_name + '.json')) as f:
+    with open(('/home/mohr/ARC_project/dependencies/ARC/data/training/' + args.task_name + '.json')) as f:
         task_dict = json.load(f)
     
     train_list = task_dict['train']
