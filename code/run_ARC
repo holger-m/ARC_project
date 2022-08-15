@@ -157,6 +157,82 @@ def f_00d62c1b(input_npa):
     
     return output_npa
 
+def f_0dfd9992(input_npa):
+    
+    output_npa = input_npa
+    
+    all_filled_flag = False
+    
+    while not all_filled_flag:
+        
+        break_flag = False
+        for i in range(output_npa.shape[0]):
+            for j in range(output_npa.shape[1]):
+                if output_npa[i,j] == 0:
+                    i_start = i
+                    j_start = j
+                    break_flag = True
+                    break
+            if break_flag:
+                break
+        
+        i_curr = i_start - 1
+        j_curr = j_start
+        state_curr = 0   # 0: right; 1: down; 2: left; 3: up
+        
+        envelope_list_relative = list()
+        envelope_list_absolute = list()
+        
+        envelope_list_relative.append([i_curr - (i_start - 1), j_curr - j_start, output_npa[i_curr, j_curr]])
+        envelope_list_absolute.append([i_curr, j_curr, output_npa[i_curr, j_curr]])
+        
+        continue_envelope_flag = True
+        
+        while continue_envelope_flag:
+            
+            if state_curr == 0:
+                if output_npa[i_curr + 1, j_curr] == 0 and output_npa[i_curr + 1, j_curr + 1] == 0:
+                    j_curr += 1
+                elif output_npa[i_curr + 1, j_curr] == 0 and output_npa[i_curr + 1, j_curr + 1] > 0:
+                    state_curr = 1
+                    i_curr += 1
+                    j_curr += 1
+            elif state_curr == 1:
+                if output_npa[i_curr, j_curr - 1] == 0 and output_npa[i_curr + 1, j_curr - 1] == 0:
+                    i_curr += 1
+                elif output_npa[i_curr, j_curr - 1] == 0 and output_npa[i_curr + 1, j_curr - 1] > 0:
+                    state_curr = 2
+                    i_curr += 1
+                    j_curr -= 1
+            elif state_curr == 2:
+                if output_npa[i_curr - 1, j_curr] == 0 and output_npa[i_curr - 1, j_curr - 1] == 0:
+                    j_curr -= 1
+                elif output_npa[i_curr - 1, j_curr] == 0 and output_npa[i_curr - 1, j_curr - 1] > 0:
+                    state_curr = 3
+                    i_curr -= 1
+                    j_curr -= 1
+            elif state_curr == 3:
+                if output_npa[i_curr, j_curr + 1] == 0 and output_npa[i_curr - 1, j_curr + 1] == 0:
+                    i_curr -= 1
+                elif output_npa[i_curr, j_curr + 1] == 0 and output_npa[i_curr - 1, j_curr + 1] > 0:
+                    state_curr = 0
+                    i_curr -= 1
+                    j_curr += 1
+            
+            if i_curr == envelope_list_absolute[0][0] and j_curr == envelope_list_absolute[0][1]:
+                continue_envelope_flag = False
+            else:
+                if i_curr >= 0 and j_curr >= 0 and i_curr < output_npa.shape[0] and j_curr < output_npa.shape[1]:
+                    envelope_list_relative.append([i_curr - (i_start - 1), j_curr - j_start, output_npa[i_curr, j_curr]])
+                    envelope_list_absolute.append([i_curr, j_curr, output_npa[i_curr, j_curr]])
+        
+        print(envelope_list_relative)
+        print(envelope_list_absolute)
+        
+        all_filled_flag = True
+    
+    return output_npa
+
 def task_selector(task_name, input_npa):
     
     if task_name == '0a938d79':
@@ -169,6 +245,8 @@ def task_selector(task_name, input_npa):
         output_npa = f_0d3d703e(input_npa)
     elif task_name == '00d62c1b':
         output_npa = f_00d62c1b(input_npa)
+    elif task_name == '0dfd9992':
+        output_npa = f_0dfd9992(input_npa)
     else:
         raise Exception('Task solver not found!')
     
@@ -184,7 +262,6 @@ def main():
         task_dict = json.load(f)
     
     train_list = task_dict['train']
-    
     for i in range(len(train_list)):
         curr_pair_dict = train_list[i]
         curr_input_npa = np.asarray(curr_pair_dict['input'])
@@ -194,6 +271,17 @@ def main():
             print('train ' + str(i) + ': ' + str(np.array_equal(curr_output_npa, f_output_npa)))
         else:
             print('train ' + str(i) + ': wrong shape')
+    
+    test_list = task_dict['test']
+    for i in range(len(test_list)):
+        curr_pair_dict = test_list[i]
+        curr_input_npa = np.asarray(curr_pair_dict['input'])
+        curr_output_npa = np.asarray(curr_pair_dict['output'])
+        f_output_npa = task_selector(args.task_name, curr_input_npa)
+        if curr_output_npa.shape == f_output_npa.shape:
+            print('test ' + str(i) + ': ' + str(np.array_equal(curr_output_npa, f_output_npa)))
+        else:
+            print('test ' + str(i) + ': wrong shape')
 
 if __name__ == '__main__':
     main()
